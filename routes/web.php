@@ -16,9 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/',  [BusinessController::class,'index'])->name('index');
 
 Auth::routes();
 
@@ -29,12 +27,12 @@ Route::group([
     'as'         => 'business.',
 ], function () {
     Route::controller(BusinessController::class)->group(function () {
-        Route::get('index',  'index')->name('index');
+        Route::get('/',  'index')->name('index');
         Route::get('create',  'create')->name('create');
         Route::post('store',  'store')->name('store');
         Route::get('edit/{id}',  'edit')->name('edit');
         Route::post('update/{id}',  'update')->name('update');
-        Route::delete('destroy/{id}',  'destroy')->name('destroy');
+        Route::delete('destroy',  'destroy')->name('destroy');
     });
 });
 
@@ -43,7 +41,7 @@ Route::group([
     'as'         => 'branch.',
 ], function () {
     Route::controller(BranchController::class)->group(function () {
-        Route::get('index',  'index')->name('index');
+        Route::get('/',  'index')->name('index');
         Route::get('create',  'create')->name('create');
         Route::post('store',  'store')->name('store');
         Route::get('show/{id}',  'show')->name('show');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Business;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class BusinessController extends Controller
 {
@@ -16,7 +17,6 @@ class BusinessController extends Controller
     public function index()
     {
         $businesses = Business::get();
-
         return view('business.index',compact('businesses'));
     }
 
@@ -49,16 +49,21 @@ class BusinessController extends Controller
             return back()->withFlashDanger($error);
         }
 
+        if ($request->hasFile('logo')) {
+            $imageName = Str::uuid()->toString() . '.' . $request->file('logo')->extension();
+            $imagePath = $request->file('logo')->storeAs('images', $imageName, 'public');
+        }
+
         $business = [
             'name' => $request->name,
             'email' => $request->email,
             'phone_number' => $request->phone_number,
-            'logo' => !empty($request->logo) ? $request->logo : null
+            'logo' => !empty($request->logo) ? $imagePath : null
         ];
 
         Business::create($business);
 
-        return route('business.index');
+        return redirect()->route('business.index')->withFlashSuccess("Business Created Successfully");
     }
 
     /**
@@ -104,15 +109,19 @@ class BusinessController extends Controller
             return back()->withFlashDanger($error);
         }
 
+        if ($request->hasFile('logo')) {
+            $imageName = Str::uuid()->toString() . '.' . $request->file('logo')->extension();
+            $imagePath = $request->file('logo')->storeAs('images', $imageName, 'public');
+        }
+
         $business = [
                         'name' => $request->name,
                         'phone_number' => $request->phone_number,
-                        'logo' => !empty($request->logo) ? $request->logo : null
+                        'logo' => !empty($request->logo) ? $imagePath : null
                     ];
 
         Business::where('id',$id)->update($business);
-
-        return route('business.index');
+        return redirect()->route('business.index')->withFlashSuccess("Business Updated Successfully");
     }
 
     /**
@@ -121,9 +130,10 @@ class BusinessController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
+        $id = $request->id;
         Business::where('id',$id)->delete();
-        return back();
+        return redirect()->route('business.index')->withFlashDanger("Business Deleted Successfully");
     }
 }

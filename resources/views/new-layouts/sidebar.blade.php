@@ -3,13 +3,13 @@
         <div class="sb-sidenav-menu">
             <div class="nav">
                 <div class="sb-sidenav-menu-heading"></div>
-                <a class="nav-link" href="{{route('bussiness.index')}}">
+                <a class="nav-link" href="{{route('business.create')}}">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                    Business
+                    Add Business
                 </a>
-                <a class="nav-link" href="/AddChild">
+                <a class="nav-link" href="{{route('branch.create')}}">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                    Branch
+                    Add Branch
                 </a>
             </div>
         </div>
