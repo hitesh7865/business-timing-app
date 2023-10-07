@@ -34,7 +34,7 @@
                                         <td>{{$business->name}}</td>
                                         <td>{{$business->email}}</td>
                                         <td>{{$business->phone_number}}</td>
-                                        <td><img src="{{ asset('storage/'.$business->logo)}}" alt="No Image" height="80px" width="80px"></td>
+                                        <td><img src="@if($business->logo) {{ asset('storage/'.$business->logo)}} @endif" alt="No Image" height="80px" width="80px"></td>
                                         <td><a class="btn btn-lg btn-success" href="{{route('business.edit',$business->id)}}">Edit</a></td>
                                         <td>
                                             <form action="{{route('business.destroy')}}" method="post">
