@@ -2,7 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
+use App\Models\BranchImage;
+use App\Models\BranchUnavailableDate;
+use App\Models\WorkingHour;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class BranchController extends Controller
 {
@@ -13,7 +20,9 @@ class BranchController extends Controller
      */
     public function index()
     {
+        $branches = Branch::with('business')->get();
 
+        return view('branch.index',compact('branches'));
     }
 
     /**
@@ -23,7 +32,7 @@ class BranchController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -34,7 +43,52 @@ class BranchController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'business_id' => 'required',
+            'name' => 'required',
+            'images.*' => 'mimes:png,jpg,jpeg'
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors();
+            return back()->withFlashDanger($error);
+        }
+
+        $branch = new Branch;
+        $branch->business_id = $request->business_id;
+        $branch->name = $request->name;
+        $branch->save();
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $branch_image = new BranchImage;
+                $imageName = Str::uuid()->toString() . '.' . $file->extension();
+                $imagePath = $file->storeAs('images', $imageName, 'public');
+                $branch_image->branch_id = $branch->id;
+                $branch_image->image_name = $imagePath;
+                $branch_image->save();
+            }
+        }
+
+        foreach($request->start_times as $key => $start_time){
+            $working_hour = new WorkingHour;
+            $working_hour->branch_id = $branch->id;
+            $working_hour->day = $request->days[$key];
+            $working_hour->start_time = $start_time;
+            $working_hour->end_time = $request->end_times[$key];
+            $working_hour->save();
+        }
+
+        if(!empty($request->branch_unavailable_dates)){
+            foreach($request->branch_unavailable_dates as $branch_unavailable_date){
+                $BranchUnavailableDate = new BranchUnavailableDate;
+                $BranchUnavailableDate->branch_id = $branch->id;
+                $BranchUnavailableDate->unavailable_date = $branch_unavailable_date;
+                $BranchUnavailableDate->save();
+            }
+        }
+
+        return route('branch.index');
     }
 
     /**
@@ -45,7 +99,8 @@ class BranchController extends Controller
      */
     public function show($id)
     {
-        //
+        $branch = Branch::with(['business','images','WorkingHours','BranchUnavailableDate'])->where('id',$id)->first();
+        return view('branch.view',compact('branch'));
     }
 
     /**
@@ -56,7 +111,8 @@ class BranchController extends Controller
      */
     public function edit($id)
     {
-        //
+        $branch = Branch::with(['business','images','WorkingHours','BranchUnavailableDate'])->where('id',$id)->first();
+        return view('branch.edit',compact('branch'));
     }
 
     /**
@@ -68,7 +124,58 @@ class BranchController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'images.*' => 'mimes:png,jpg,jpeg'
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors();
+            return back()->withFlashDanger($error);
+        }
+
+        Branch::where('id',$id)->update(['name' => $request->name]);
+
+        $files = BranchImage::where('branch_id',$id)->pluck('image_name');
+        foreach($files as $file){
+            $filePath = 'public/images/'.$file;
+            if (Storage::disk('local')->exists($filePath)) {
+                Storage::disk('local')->delete($filePath);
+            }
+        }
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $branch_image = new BranchImage;
+                $imageName = Str::uuid()->toString() . '.' . $file->extension();
+                $imagePath = $file->storeAs('images', $imageName, 'public');
+                $branch_image->branch_id = $id;
+                $branch_image->image_name = $imagePath;
+                $branch_image->save();
+            }
+        }
+
+        WorkingHour::where('branch_id',$id)->delete();
+        foreach($request->start_times as $key => $start_time){
+            $working_hour = new WorkingHour;
+            $working_hour->branch_id = $id;
+            $working_hour->day = $request->days[$key];
+            $working_hour->start_time = $start_time;
+            $working_hour->end_time = $request->end_times[$key];
+            $working_hour->save();
+        }
+
+        BranchUnavailableDate::where('branch_id',$id)->delete();
+        if(!empty($request->branch_unavailable_dates)){
+            foreach($request->branch_unavailable_dates as $branch_unavailable_date){
+                $BranchUnavailableDate = new BranchUnavailableDate;
+                $BranchUnavailableDate->branch_id = $id;
+                $BranchUnavailableDate->unavailable_date = $branch_unavailable_date;
+                $BranchUnavailableDate->save();
+            }
+        }
+
+        return route('branch.index');
     }
 
     /**
@@ -79,6 +186,10 @@ class BranchController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Branch::where('id',$id)->delete();
+        BranchImage::where('branch_id',$id)->delete();
+        BranchUnavailableDate::where('branch_id',$id)->delete();
+        WorkingHour::where('branch_id',$id)->delete();
+        return back();
     }
 }

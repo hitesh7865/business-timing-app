@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class BusinessController extends Controller
 {
@@ -13,7 +15,9 @@ class BusinessController extends Controller
      */
     public function index()
     {
-        die('1');
+        $businesses = Business::get();
+
+        return view('business.index',compact('businesses'));
     }
 
     /**
@@ -23,7 +27,7 @@ class BusinessController extends Controller
      */
     public function create()
     {
-        //
+        return view('business.create');
     }
 
     /**
@@ -34,7 +38,27 @@ class BusinessController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|unique:businesses',
+            'logo' => 'mimes:png,jpg,jpeg',
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors();
+            return back()->withFlashDanger($error);
+        }
+
+        $business = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone_number' => $request->phone_number,
+            'logo' => !empty($request->logo) ? $request->logo : null
+        ];
+
+        Business::create($business);
+
+        return route('business.index');
     }
 
     /**
@@ -56,7 +80,9 @@ class BusinessController extends Controller
      */
     public function edit($id)
     {
-        //
+        $business = Business::where('id',$id)->first();
+
+        return view('business.edit',compact('business'));
     }
 
     /**
@@ -68,7 +94,25 @@ class BusinessController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'logo' => 'mimes:png,jpg,jpeg',
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors();
+            return back()->withFlashDanger($error);
+        }
+
+        $business = [
+                        'name' => $request->name,
+                        'phone_number' => $request->phone_number,
+                        'logo' => !empty($request->logo) ? $request->logo : null
+                    ];
+
+        Business::where('id',$id)->update($business);
+
+        return route('business.index');
     }
 
     /**
@@ -79,6 +123,7 @@ class BusinessController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Business::where('id',$id)->delete();
+        return back();
     }
 }

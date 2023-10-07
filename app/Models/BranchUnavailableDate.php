@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class BranchUnavailableDate extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'branch_id',
+        'unavailable_date',
+    ];
+
+    protected $dates = [
+        'unavailable_date',
+        'created_at',
+        'updated_at',
+    ];
 }

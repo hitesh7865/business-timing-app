@@ -34,7 +34,7 @@ Route::group([
         Route::post('store',  'store')->name('store');
         Route::get('edit/{id}',  'edit')->name('edit');
         Route::post('update/{id}',  'update')->name('update');
-        Route::delete('destroy',  'destroy')->name('destroy');
+        Route::delete('destroy/{id}',  'destroy')->name('destroy');
     });
 });
 
@@ -46,8 +46,9 @@ Route::group([
         Route::get('index',  'index')->name('index');
         Route::get('create',  'create')->name('create');
         Route::post('store',  'store')->name('store');
+        Route::get('show/{id}',  'show')->name('show');
         Route::get('edit/{id}',  'edit')->name('edit');
         Route::post('update/{id}',  'update')->name('update');
-        Route::delete('destroy',  'destroy')->name('destroy');
+        Route::delete('destroy/{id}',  'destroy')->name('destroy');
     });
 });
