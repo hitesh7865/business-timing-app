@@ -13,15 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('working_hours', function (Blueprint $table) {
+        Schema::create('days', function (Blueprint $table) {
             $table->id();
+            $table->enum('day', [1,2,3,4,5,6,7]);
             $table->unsignedBigInteger('branch_id');
-            $table->unsignedBigInteger('day_id');
-            $table->time('start_time');
-            $table->time('end_time');
             $table->timestamps();
-            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
-            $table->foreign('day_id')->references('id')->on('days')->onDelete('cascade');
         });
     }
 
@@ -32,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('working_hours');
+        Schema::dropIfExists('days');
     }
 };

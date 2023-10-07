@@ -5,15 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WorkingHour extends Model
+class Day extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'day',
         'branch_id',
-        'day_id',
-        'start_time',
-        'end_time',
     ];
 
     protected $dates = [

@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\BranchImage;
 use App\Models\BranchUnavailableDate;
 use App\Models\Business;
+use App\Models\Day;
 use App\Models\WorkingHour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -71,14 +72,23 @@ class BranchController extends Controller
             }
         }
 
-        if(!empty($request->start_times)){
-            foreach($request->start_times as $key => $start_time){
-                $working_hour = new WorkingHour;
-                $working_hour->branch_id = $branch->id;
-                $working_hour->day = $request->days[$key];
-                $working_hour->start_time = $start_time;
-                $working_hour->end_time = $request->end_times[$key];
-                $working_hour->save();
+        if ($request->days) {
+            foreach ($request->days as $day) {
+                $day = new Day;
+                $day->branch_id = $branch->id;
+                $day->number = $day;
+                $day->save();
+
+                if(!empty($request->start_times.$day)){
+                    foreach($request->start_times.$day as $key => $start_time){
+                        $working_hour = new WorkingHour;
+                        $working_hour->branch_id = $branch->id;
+                        $working_hour->day_id = $day->id;
+                        $working_hour->start_time = $start_time;
+                        $working_hour->end_time = $request->end_times.$day[$key];
+                        $working_hour->save();
+                    }
+                }
             }
         }
 
@@ -158,15 +168,24 @@ class BranchController extends Controller
             }
         }
 
-        WorkingHour::where('branch_id',$id)->delete();
-        if(!empty($request->start_times)){
-            foreach($request->start_times as $key => $start_time){
-                $working_hour = new WorkingHour;
-                $working_hour->branch_id = $id;
-                $working_hour->day = $request->days[$key];
-                $working_hour->start_time = $start_time;
-                $working_hour->end_time = $request->end_times[$key];
-                $working_hour->save();
+        if ($request->days) {
+            foreach ($request->days as $day) {
+                $day = new Day;
+                $day->branch_id = $id;
+                $day->number = $day;
+                $day->save();
+
+                WorkingHour::where('branch_id',$id)->delete();
+                if(!empty($request->start_times.$day)){
+                    foreach($request->start_times.$day as $key => $start_time){
+                        $working_hour = new WorkingHour;
+                        $working_hour->branch_id = $id;
+                        $working_hour->day_id = $day->id;
+                        $working_hour->start_time = $start_time;
+                        $working_hour->end_time = $request->end_times.$day[$key];
+                        $working_hour->save();
+                    }
+                }
             }
         }
 
