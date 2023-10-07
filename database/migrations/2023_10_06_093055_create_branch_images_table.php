@@ -15,7 +15,10 @@ return new class extends Migration
     {
         Schema::create('branch_images', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('branch_id');
+            $table->string('image_name');
             $table->timestamps();
+            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
         });
     }
 

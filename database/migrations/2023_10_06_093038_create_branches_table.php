@@ -15,7 +15,10 @@ return new class extends Migration
     {
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('business_id');
+            $table->string('name');
             $table->timestamps();
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
         });
     }
 
