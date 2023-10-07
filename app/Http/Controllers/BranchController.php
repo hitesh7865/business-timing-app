@@ -79,13 +79,13 @@ class BranchController extends Controller
                 $day->number = $day;
                 $day->save();
 
-                if(!empty($request->start_times.$day)){
-                    foreach($request->start_times.$day as $key => $start_time){
+                if(!empty($request->start_times[$day])){
+                    foreach($request->start_times[$day] as $key => $start_time){
                         $working_hour = new WorkingHour;
                         $working_hour->branch_id = $branch->id;
                         $working_hour->day_id = $day->id;
                         $working_hour->start_time = $start_time;
-                        $working_hour->end_time = $request->end_times.$day[$key];
+                        $working_hour->end_time = $request->end_times[$day][$key];
                         $working_hour->save();
                     }
                 }
@@ -168,6 +168,7 @@ class BranchController extends Controller
             }
         }
 
+        WorkingHour::where('branch_id',$id)->delete();
         if ($request->days) {
             foreach ($request->days as $day) {
                 $day = new Day;
@@ -175,14 +176,13 @@ class BranchController extends Controller
                 $day->number = $day;
                 $day->save();
 
-                WorkingHour::where('branch_id',$id)->delete();
-                if(!empty($request->start_times.$day)){
-                    foreach($request->start_times.$day as $key => $start_time){
+                if(!empty($request->start_times[$day])){
+                    foreach($request->start_times[$day] as $key => $start_time){
                         $working_hour = new WorkingHour;
                         $working_hour->branch_id = $id;
                         $working_hour->day_id = $day->id;
                         $working_hour->start_time = $start_time;
-                        $working_hour->end_time = $request->end_times.$day[$key];
+                        $working_hour->end_time = $request->end_times[$day][$key];
                         $working_hour->save();
                     }
                 }
