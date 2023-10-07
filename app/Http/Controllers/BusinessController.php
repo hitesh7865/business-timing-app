@@ -63,7 +63,7 @@ class BusinessController extends Controller
 
         Business::create($business);
 
-        return redirect()->route('business.index')->withFlashSuccess("Business Created Successfully");
+        return redirect()->route('index')->withFlashSuccess("Business Created Successfully");
     }
 
     /**
@@ -120,7 +120,7 @@ class BusinessController extends Controller
                     ];
 
         Business::where('id',$id)->update($business);
-        return redirect()->route('business.index')->withFlashSuccess("Business Updated Successfully");
+        return redirect()->route('index')->withFlashSuccess("Business Updated Successfully");
     }
 
     /**
@@ -133,6 +133,6 @@ class BusinessController extends Controller
     {
         $id = $request->id;
         Business::where('id',$id)->delete();
-        return redirect()->route('business.index')->withFlashDanger("Business Deleted Successfully");
+        return redirect()->route('index')->withFlashDanger("Business Deleted Successfully");
     }
 }

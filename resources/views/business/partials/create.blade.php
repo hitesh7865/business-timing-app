@@ -4,7 +4,7 @@
         <div class="container-fluid">
             <h1 class="mt-4">Add Business</h1>
             <ol class="breadcrumb mb-4">
-                <li class="breadcrumb-item active"><a href="{{route('business.index')}}">Businesses </a> / Add Business</li>
+                <li class="breadcrumb-item active"><a href="/">Businesses </a> / Add Business</li>
             </ol>
             <form role="form" action="{{route('business.store')}}" enctype="multipart/form-data" method="post">
                 @csrf
