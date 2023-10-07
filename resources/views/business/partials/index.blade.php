@@ -27,24 +27,30 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($businesses as $key => $business)
-                                <tr class="text-center">
-                                    <td>{{++$key}}</td>
-                                    <td>{{$business->name}}</td>
-                                    <td>{{$business->email}}</td>
-                                    <td>{{$business->phone_number}}</td>
-                                    <td><img src="{{ asset('storage/'.$business->logo)}}" alt="No Image" height="80px" width="80px"></td>
-                                    <td><a class="btn btn-lg btn-success" href="{{route('business.edit',$business->id)}}">Edit</a></td>
-                                    <td>
-                                        <form action="{{route('business.destroy')}}" method="post">
-                                            @csrf
-                                            @method('delete')
-                                            <input type="hidden" value="{{$business->id}}" name="id">
-                                            <button class="btn btn-lg btn-danger" type="submit">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                @endforeach
+                                @if(count($businesses) > 0)
+                                    @foreach ($businesses as $key => $business)
+                                    <tr class="text-center">
+                                        <td>{{++$key}}</td>
+                                        <td>{{$business->name}}</td>
+                                        <td>{{$business->email}}</td>
+                                        <td>{{$business->phone_number}}</td>
+                                        <td><img src="{{ asset('storage/'.$business->logo)}}" alt="No Image" height="80px" width="80px"></td>
+                                        <td><a class="btn btn-lg btn-success" href="{{route('business.edit',$business->id)}}">Edit</a></td>
+                                        <td>
+                                            <form action="{{route('business.destroy')}}" method="post">
+                                                @csrf
+                                                @method('delete')
+                                                <input type="hidden" value="{{$business->id}}" name="id">
+                                                <button class="btn btn-lg btn-danger" type="submit">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                    <tr class="text-center">
+                                        <td colspan="5">No Businesses</td>
+                                    </tr>
+                                @endif
                             </tbody>
                         </table>
                     </div>

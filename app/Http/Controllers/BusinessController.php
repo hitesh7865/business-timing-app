@@ -86,7 +86,6 @@ class BusinessController extends Controller
     public function edit($id)
     {
         $business = Business::where('id',$id)->first();
-
         return view('business.edit',compact('business'));
     }
 

@@ -47,6 +47,6 @@ Route::group([
         Route::get('show/{id}',  'show')->name('show');
         Route::get('edit/{id}',  'edit')->name('edit');
         Route::post('update/{id}',  'update')->name('update');
-        Route::delete('destroy/{id}',  'destroy')->name('destroy');
+        Route::delete('destroy',  'destroy')->name('destroy');
     });
 });

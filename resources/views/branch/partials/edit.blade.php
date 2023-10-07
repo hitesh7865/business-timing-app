@@ -4,42 +4,36 @@
         <div class="container-fluid">
             <h1 class="mt-4">Edit Branch</h1>
             <ol class="breadcrumb mb-4">
-                <li class="breadcrumb-item active"><a href="{{route('branch.index')}}">branches </a> / Edit branch</li>
+                <li class="breadcrumb-item active"><a href="{{route('branch.index')}}">Branches </a> / Edit Branch</li>
             </ol>
             <form role="form" action="{{route('branch.update',$branch->id)}}" enctype="multipart/form-data" method="post">
                 @csrf
                 <div class="form-group row">
-                    <label class="col-xl-3">branch Name<i class="text-danger">*</i></label>
+                    <label class="col-xl-3">Business<i class="text-danger">*</i></label>
+                    <div class="form-group">
+                        <select class="form-control col-xs-9" name="business_id" required>
+                            <option value="">Select any</option>
+                            @foreach ($businesses as $business)
+                            <option value="{{$business->id}}" @if($branch->business_id == $business->id) {{'selected'}} @endif>{{$business->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-xl-3">Branch Name<i class="text-danger">*</i></label>
                     <div class="form-group">
                         <div class="col-xs-7">
-                            <input name="name" type="text" class="form-control" id="" placeholder="Enter branch Name" value="{{$business->name}}" required>
+                            <input name="name" type="text" class="form-control" id="" placeholder="Enter Branch Name" value="{{$branch->name}}" required>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-xl-3">Email<i class="text-danger">*</i></label>
+                    <label class="col-xl-3">Images</label>
                     <div class="form-group">
                         <div class="col-xs-7">
-                            <input name="email" type="email" class="form-control" id="" placeholder="Enter Email" value="{{$business->email}}" disabled>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-xl-3">Phone Number</label>
-                    <div class="form-group">
-                        <div class="col-xs-7">
-                            <input name="phone_number" type="text" class="form-control" id="" placeholder="Enter Phone Number" value="{{$business->phone_number}}">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-xl-3">Logo</label>
-                    <div class="form-group">
-                        <div class="col-xs-7">
-                            <input name="logo" type="file" value="{{$business->logo}}" accept=".jpg,.png,.jpeg">
+                            <input name="images[]" type="file" accept=".jpg,.png,.jpeg" multiple>
                         </div>
                     </div>
                 </div>

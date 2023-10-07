@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\BranchImage;
 use App\Models\BranchUnavailableDate;
+use App\Models\Business;
 use App\Models\WorkingHour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -21,7 +22,6 @@ class BranchController extends Controller
     public function index()
     {
         $branches = Branch::with('business')->get();
-
         return view('branch.index',compact('branches'));
     }
 
@@ -32,7 +32,8 @@ class BranchController extends Controller
      */
     public function create()
     {
-
+        $businesses = Business::orderBy('name','asc')->get();
+        return view('branch.create',compact('businesses'));
     }
 
     /**
@@ -70,13 +71,15 @@ class BranchController extends Controller
             }
         }
 
-        foreach($request->start_times as $key => $start_time){
-            $working_hour = new WorkingHour;
-            $working_hour->branch_id = $branch->id;
-            $working_hour->day = $request->days[$key];
-            $working_hour->start_time = $start_time;
-            $working_hour->end_time = $request->end_times[$key];
-            $working_hour->save();
+        if(!empty($request->start_times)){
+            foreach($request->start_times as $key => $start_time){
+                $working_hour = new WorkingHour;
+                $working_hour->branch_id = $branch->id;
+                $working_hour->day = $request->days[$key];
+                $working_hour->start_time = $start_time;
+                $working_hour->end_time = $request->end_times[$key];
+                $working_hour->save();
+            }
         }
 
         if(!empty($request->branch_unavailable_dates)){
@@ -87,8 +90,7 @@ class BranchController extends Controller
                 $BranchUnavailableDate->save();
             }
         }
-
-        return route('branch.index');
+        return redirect()->route('branch.index')->withFlashSuccess("Branch Created Successfully");
     }
 
     /**
@@ -99,7 +101,7 @@ class BranchController extends Controller
      */
     public function show($id)
     {
-        $branch = Branch::with(['business','images','WorkingHours','BranchUnavailableDate'])->where('id',$id)->first();
+        $branch = Branch::with(['business','images','WorkingHours','BranchUnavailableDates'])->where('id',$id)->first();
         return view('branch.view',compact('branch'));
     }
 
@@ -111,8 +113,9 @@ class BranchController extends Controller
      */
     public function edit($id)
     {
-        $branch = Branch::with(['business','images','WorkingHours','BranchUnavailableDate'])->where('id',$id)->first();
-        return view('branch.edit',compact('branch'));
+        $businesses = Business::orderBy('name','asc')->get();
+        $branch = Branch::with(['business','images','WorkingHours','BranchUnavailableDates'])->where('id',$id)->first();
+        return view('branch.edit',compact('branch','businesses'));
     }
 
     /**
@@ -156,13 +159,15 @@ class BranchController extends Controller
         }
 
         WorkingHour::where('branch_id',$id)->delete();
-        foreach($request->start_times as $key => $start_time){
-            $working_hour = new WorkingHour;
-            $working_hour->branch_id = $id;
-            $working_hour->day = $request->days[$key];
-            $working_hour->start_time = $start_time;
-            $working_hour->end_time = $request->end_times[$key];
-            $working_hour->save();
+        if(!empty($request->start_times)){
+            foreach($request->start_times as $key => $start_time){
+                $working_hour = new WorkingHour;
+                $working_hour->branch_id = $id;
+                $working_hour->day = $request->days[$key];
+                $working_hour->start_time = $start_time;
+                $working_hour->end_time = $request->end_times[$key];
+                $working_hour->save();
+            }
         }
 
         BranchUnavailableDate::where('branch_id',$id)->delete();
@@ -175,7 +180,7 @@ class BranchController extends Controller
             }
         }
 
-        return route('branch.index');
+        return redirect()->route('branch.index')->withFlashSuccess("Branch Updated Successfully");
     }
 
     /**
@@ -184,12 +189,13 @@ class BranchController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
+        $id = $request->id;
         Branch::where('id',$id)->delete();
         BranchImage::where('branch_id',$id)->delete();
         BranchUnavailableDate::where('branch_id',$id)->delete();
         WorkingHour::where('branch_id',$id)->delete();
-        return back();
+        return back()->withFlashDanger("Branch Deleted Successfully");
     }
 }
